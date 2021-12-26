@@ -4,5 +4,11 @@
 	"python.analysis.diagnosticSeverityOverrides": {
 		"reportMissingModuleSource": "none"
 	},
-	"editor.fontSize": 20
+	"editor.fontSize": 20,
+	"python.analysis.extraPaths": [
+		"",
+		"c:\\Users\\shadowlerone\\.vscode\\extensions\\joedevivo.vscode-circuitpython-0.1.15\\stubs",
+		"c:\\Users\\shadowlerone\\AppData\\Roaming\\Code\\User\\globalStorage\\joedevivo.vscode-circuitpython\\bundle\\20211225\\adafruit-circuitpython-bundle-py-20211225\\lib"
+	],
+	"circuitpython.board.version": null
 }

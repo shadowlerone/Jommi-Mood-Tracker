@@ -34,20 +34,33 @@ class Tracker(tk.Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("Moods")
-		self.moods = ttk.Frame(self)
+		
 		self.new_mood = ttk.Button(self, text="Create entry", command=self.newmood)
 		self.new_mood.pack(pady=40)
 		self.load_moods()
-		self.moods.pack(pady=40)
+		
+		self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+	def reload_moods(self):
+		self.moods.destroy()
+		self.load_moods()
 	def load_moods(self):
+		self.moods = ttk.Frame(self)
 		with open(FP) as file:
 			moods = json.load(file)
-			self.moods_list = [MoodFrame.from_mood(self.moods, Mood.from_json(m)).pack(expand=True, fill=tk.BOTH) for i, m in enumerate(moods['moods'])]
-			# [m.pack() for m in self.moods_list]
+			self.moods_list = [MoodFrame.from_mood(self.moods, Mood.from_json(m)).pack(expand=True, fill=tk.BOTH, pady=10, padx=40) for i, m in enumerate(moods['moods'])]
+		self.moods.pack(pady=40)
 
 	def newmood(self):
-		addMood = AddMoods(self)
+		self.addMood = AddMoods(self)
+
+	def on_closing(self):
+		# if tk.messagebox.askokcancel("Quit", "Do you want to quit?"):
+		try:
+			self.addMood.destroy()
+		except Exception as e:
+			print(e)
+		self.destroy()
 	
 class MoodFrame(ttk.Frame):
 	def __init__(self, *args) -> None:
@@ -96,7 +109,7 @@ class AddMoods(tk.Tk):
 			moods['moods'].append(mood.to_json())
 			with open(FP, 'w') as js:
 				json.dump(moods, js)
-		self.parent.load_moods()
+		self.parent.reload_moods()
 		self.destroy()
 
 class Greeting(tk.Tk):
@@ -126,4 +139,16 @@ class Greeting(tk.Tk):
 greetings = Greeting()
 
 if __name__ == "__main__":
+	try: 
+		with open(FP, "r+") as file:
+			l = json.load(file)
+			# print(l)
+			if 'moods' not in l.keys():
+				l['moods'] = []
+				json.dump(l ,file)
+	except (FileNotFoundError, json.decoder.JSONDecodeError) as e:
+		print(e)
+		with open(FP, "r+") as file:
+			json.dump({'moods':[]}, file)
+			
 	tk.mainloop()
