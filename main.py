@@ -1,45 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Dec 06 13:51:13 2021
-
-@author: Jonathan Baz
-"""
-
-# final project woohoo
-
-"""
-The student has to create a Python GUI project by using tkinter package. 
-In the project, students have to includes at least:
-	
-*a. 2 windows, one window can be opened from another window
-*b. 2 entries, no matter what user input, your code cannot crash
-*c. 3 labels
-*d. 1 image
-*e. 1 group of radio buttons (2 or more buttons inside)
-*f. 1 button that link with one handler
-*g. SELECTION if elif else
-"""
-
 from tkinter import *
 from tkinter.ttk import *
 from PIL import Image, ImageTk
+# import configparser
 import json
+
+FP = "moods.json"
 
 
 def openNewWindow(*arg):
-	isValid = False
-	if len(greetings.ent.get()) < 2:
-		isValid = False
-	elif len(greetings.ent.get()) > 32:
-		isValid = False
-	else: 
-		isValid = True
-	if isValid:
-		newWindow = AddMood()
-		greetings.destroy()
-	# else: 
-	# 	messagebox.showwarning("Warning", "Invalid Name")
-
+	newWindow = Tracker()
+	greetings.destroy()
 
 class Mood():
 	def __init__(self, mood = None, text = None):
@@ -71,7 +41,7 @@ class Tracker(Tk):
 		self.load_moods()
 	
 	def load_moods(self):
-		with open("moods.json") as file:
+		with open(FP) as file:
 			moods = json.load(file)
 			i = 0
 			for m in moods['moods']:
@@ -97,7 +67,7 @@ class MoodWindow(Tk):
 		super().__init__()
 		self.title(f"Viewing Mood {id}")
 		
-		with open("moods.json") as js:
+		with open(FP) as js:
 			mood = Mood.from_json(json.load(js)['moods'][id])
 
 		self.text = Label(self, mood.text)
@@ -141,16 +111,15 @@ class AddMoods(Tk):
 		print(text)
 		mood = Mood(text=text, mood= choice)
 
-		with open("moods.json") as js:
+		with open(FP) as js:
 			moods = json.load(js)
 			moods['moods'].append(mood.to_json())
 			print(type(moods))
-			with open('moods.json', 'w') as js:
+			with open(FP, 'w') as js:
 				json.dump(moods, js)
 		self.destroy()
 
-class AddMood(Tk):
-	
+"""class AddMood(Tk):
 	def __init__(self):
 		super().__init__()
 		self.title("Expressional Analysis")
@@ -189,42 +158,36 @@ class AddMood(Tk):
 		print(text)
 		mood = Mood(text=text, mood= choice)
 
-		with open("moods.json") as js:
+		with open(FP) as js:
 			moods = json.load(js)
 			moods['moods'].append(mood.to_json())
 			print(type(moods))
-			with open('moods.json', 'w') as js:
+			with open(FP, 'w') as js:
 				json.dump(moods, js)
 
 		global tracker 
 		tracker = Tracker()
 		self.destroy()
-
+"""
 
 class Greeting(Tk):
 	def __init__(self) -> None:
 		super().__init__()
 		self.title("Anonymous Mood Journal")
 		self.geometry("700x350")
-
 		self.label = Label(self, text ="Tell me, what is your name?")
 		self.label.pack(pady = 10)
-
 		#user input 
 		self.ent = Entry(self, text =" ")
 		self.ent.pack(pady = 10)
-
-		btn = Button(self, text ="Click to proceed.", command = openNewWindow)
+		btn = Button(self, text ="Click to proceed.", command = self.proceed)
 		#ent.bind('<Return>', openNewWindow)
 		btn.pack(pady = 10) 
 
-
-		image = Image.open("hi_bot.jpg")
-		image = image.resize((175,175), Image.ANTIALIAS)
-		image_photo = ImageTk.PhotoImage(image)
-		image_label = Label(self, image=image_photo)
-		image_label.image = image_photo
-		image_label.pack()
+	def proceed(self):
+		if self.ent.get():
+			if len(self.ent.get()) in range(2,32):
+				openNewWindow()
 
 
 
@@ -232,5 +195,5 @@ class Greeting(Tk):
 greetings = Greeting()
 
 
-
-mainloop()
+if __name__ == "__main__":
+	mainloop()
